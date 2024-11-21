@@ -28,27 +28,52 @@ class Debito inherits MedioConSaldo {
 class Credito {
   const banco
   const cantCuotas
+  const cuotasFuturas = []
   const cuotasPendientes = []
 
   method puedePagar(persona, precio) = banco.montoMax() >= precio
 
   method gastar(precio) {
-    self.generarCuota(self.valorCuota(precio))
+    self.generarCuotasFuturas(precio)
   }
 
-  method valorCuota(precio) = (precio * bancoCentral.interes()) / cantCuotas // sacar
-
-  method generarCuota(valor) {
-    cuotasPendientes.add(new Cuota(mes = programa.mes, numCuota = 0, valor = valor, tarjeta = self))
+  method generarCuotasFuturas(precio) { // :(
+    var mes = programa.mes() 
+    var i = 0
+    cantCuotas.times{
+      mes += 1
+      i += 1
+      cuotasFuturas.add(new Cuota(mes = mes, numCuota = i, valor = precio, tarjeta = self))
+    }
   }
 
-  method pagarCuotas(sueldo) {
-    cuotasPendientes.forEach{cuota => cuota.pagar(sueldo)}
+  method pagarCuotas(dinero) {
+    var resto = dinero
+    cuotasPendientes.forEach{cuota => 
+    if (cuota.pagar(resto))
+      cuotasPendientes.remove(cuota)
+      resto -= cuota.valorFinal()
+    }
+    efectivo.sumarEfectivo(resto)
+    // if (resto == dinero) no se pago ninguna deuda
   }
 
-  method totalCuotasImpagas(mes) {
-    
+  method totalCuotasImpagas() {
+    cuotasPendientes.sum()
   }
+
+  method actualizarDeudas(mes){
+    cuotasFuturas.forEach{cuota => 
+    if (cuota.mes() == mes) {
+      cuotasFuturas.remove(cuota)
+      cuotasPendientes.add(cuota)
+    }
+    }
+  }
+}
+
+class CreditoPremium inherits Credito {
+    override method puedePagar(persona, precio) = true // Sin monto maximo
 }
 
 object bancoCentral {
@@ -60,18 +85,12 @@ class Banco {
 }
 
 class Cuota {
-  const mes
-  var valor
+  const property mes
+  const valor
   const numCuota
   const tarjeta
 
-  method calcularValor() = (valor * bancoCentral.interes()) / tarjeta.cantCuotas()
+  method valorFinal() = (valor * bancoCentral.interes()) / tarjeta.cantCuotas()
 
-  method pagar(sueldo) {
-    if (sueldo >= valor) {
-      valor = 0
-      //sueldo -= valor
-
-    }
-  }
+  method pagar(resto) = resto >= self.valorFinal() 
 }
