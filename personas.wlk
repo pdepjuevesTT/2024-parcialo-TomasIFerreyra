@@ -10,11 +10,14 @@ object programa {
     mes += 1
   }
 
+  method agregarPersona(persona) {
+    personas.add(persona)
+  }
+
   method personaConMasCosas() { // :(
     const maximoCosas = personas.map{persona => persona.cantCosas()}.max()
     const personaConMasCosas = personas.removeAllSuchThat{persona => persona.cantCosas() != maximoCosas}
     return personaConMasCosas
-
   }
 }
 
@@ -40,15 +43,11 @@ class Persona {
   }
 
   method pagarDeudas() {
-    mediosDisponibles.filter{medio => 
-      if (medio.esCredito()) {
-       medio.pagarCuotas(sueldo)
-      }  
-    }
+    mediosDisponibles.filter{medio => medio.esCredito()}.forEach{medio => medio.pagarCuotas(sueldo)}
   }
 
   method actualizarDeudas(mes) {
-    mediosDisponibles.filter{medio => medio.esCredito()}.actualizarDeudas(mes)
+    mediosDisponibles.filter{medio => medio.esCredito()}.forEach{medio => medio.actualizarDeudas(mes)}
   }
 }
 
@@ -70,6 +69,6 @@ class CompradorCompulsivo inherits Persona {
 
 class PagadorCompulsivo inherits Persona {
   override method pagarDeudas() {
-    
+
   }
 }

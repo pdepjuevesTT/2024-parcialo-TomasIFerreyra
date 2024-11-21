@@ -1,7 +1,7 @@
 import personas.*
 import medioPago.*
 
-describe "Tests compra con credito" {
+describe "Tests compras y sueldos" {
 
   const banco = new Banco(montoMax = 1000)
   const tarjeta = new Credito(banco = banco, cantCuotas = 6)
@@ -10,6 +10,12 @@ describe "Tests compra con credito" {
   test "Sube la cantidad de cosas de Juan" {
     juan.comprar(tele)
     assert.that(juan.cantCosas() == 1)
+  }
+
+  test "Recibe sueldo" {
+    programa.agregarPersona(juan)
+    programa.pasaMes()
+    assert.that(efectivo.saldo() > 0)
   }
 
 }
