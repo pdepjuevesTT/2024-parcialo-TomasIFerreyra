@@ -1,9 +1,21 @@
-import example.pepita
+import personas.*
+import medioPago.*
 
-describe "group of tests for pepita" {
+describe "Tests compras y sueldos" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+  const banco = new Banco(montoMax = 1000)
+  const tarjeta = new Credito(banco = banco, cantCuotas = 6)
+  const juan = new Persona(formaFavorita = tarjeta, sueldo = 2000)
+  const tele = new Cosa(precio = 500)
+  test "Sube la cantidad de cosas de Juan" {
+    juan.comprar(tele)
+    assert.that(juan.cantCosas() == 1)
+  }
+
+  test "Recibe sueldo" {
+    programa.agregarPersona(juan)
+    programa.pasaMes()
+    assert.that(efectivo.saldo() > 0)
   }
 
 }

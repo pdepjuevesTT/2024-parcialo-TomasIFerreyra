@@ -1,6 +1,6 @@
 
 
-## Example
+## Parcial Objetos
 
-TODO
+Alumno: Tomas Ferreyra
 
